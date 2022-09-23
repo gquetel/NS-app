@@ -290,7 +290,7 @@ def server():
                             <th colspan="1">Subdomains</th>
                             <th colspan="1">RFC</th>
                             <th colspan="1">Tests</th>
-                            <th colspan="1">Expected outcome</th>
+                            <th colspan="1">Should be reached ?</th>
                             <th colspan="1">Reached</th>
                         </tr>
                     </thead>
@@ -303,8 +303,8 @@ def server():
                             <td id="sub1">
                                 <script src="https://sub1.tls.gquetel.fr/sub1.js"></script>
                                 <script>
-                                    if (res_sub1) { document.getElementById('sub1').innerHTML = "<strong style='color: green'>YES</strong>"; }
-                                    else { document.getElementById('sub1').innerHTML = "<strong style='color: red'>NO</strong>"; }
+                                    if (res_sub1) { document.getElementById('sub1').innerHTML = "<strong style='color: red'>YES</strong>"; }
+                                    else { document.getElementById('sub1').innerHTML = "<strong style='color: green'>NO</strong>"; }
                                 </script>
                             </td>
                         </tr>
@@ -315,8 +315,8 @@ def server():
                             <td>NO</td>
                             <td id="sub2">
                                 <script src="https://sub2.tls.gquetel.fr/sub2.js"></script>
-                                <script> if (res_sub2) { document.getElementById('sub2').innerHTML = "<strong style='color: green'>YES</strong>"; }
-                                            else { document.getElementById('sub2').innerHTML = "<strong style='color: red'>NO</strong>"; }
+                                <script> if (res_sub2) { document.getElementById('sub2').innerHTML = "<strong style='color: red'>YES</strong>"; }
+                                            else { document.getElementById('sub2').innerHTML = "<strong style='color: green'>NO</strong>"; }
                                 </script>
                             </td>
                         </tr>
@@ -339,8 +339,8 @@ def server():
                             <td>NO</td>
                             <td id="ssub3">
                                 <script src="https://sub.sub3.tls.gquetel.fr/ssub3.js"></script>
-                                <script> if (res_ssub3) { document.getElementById('ssub3').innerHTML = "<strong style='color: green'>YES</strong>"; }
-                                            else { document.getElementById('ssub3').innerHTML = "<strong style='color: red'>NO</strong>"; }
+                                <script> if (res_ssub3) { document.getElementById('ssub3').innerHTML = "<strong style='color: red'>YES</strong>"; }
+                                            else { document.getElementById('ssub3').innerHTML = "<strong style='color: green'>NO</strong>"; }
                                 </script>
                             </td>
                         </tr>
@@ -351,8 +351,8 @@ def server():
                             <td>NO</td>
                             <td id="sssub3">
                                 <script src="https://sub.sub.sub3.tls.gquetel.fr/sssub3.js"></script>
-                                <script> if (res_sssub3) { document.getElementById('sssub3').innerHTML = "<strong style='color: green'>YES</strong>"; }
-                                            else { document.getElementById('sssub3').innerHTML = "<strong style='color: red'>NO</strong>"; }
+                                <script> if (res_sssub3) { document.getElementById('sssub3').innerHTML = "<strong style='color: red'>YES</strong>"; }
+                                            else { document.getElementById('sssub3').innerHTML = "<strong style='color: green'>NO</strong>"; }
                                 </script>
                             </td>
                         </tr>
