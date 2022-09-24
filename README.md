@@ -7,8 +7,8 @@ To also verify that connected client properly does certificate verification, we 
 |--------------|--------------------------------|-------------------------------|
 | sub1         | Certificate outdated/incorrect | No                            |
 | sub2         | Self-signed certificate        | No                            |
-| sub3         | Wildcard certificate           | Yes                           |
-| sub.sub3     | Wildcard certificate           | No                            |
+| sub3         | Wildcard certificate           | No                           |
+| sub.sub3     | Wildcard certificate           | Yes                            |
 | sub.sub.sub3 | Wildcard certificate           | No                            |
 
 

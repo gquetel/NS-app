@@ -334,11 +334,11 @@ def server():
                             <td>Sub 3</td>
                             <td><a href="https://datatracker.ietf.org/doc/html/rfc4592">RFC 4592</a></td>
                             <td>Wildcard</td>
-                            <td>YES</td>
+                            <td>NO</td>
                             <td id="sub3">
                                 <script src="https://sub3.tls.gquetel.fr/sub3.js"></script>
-                                <script> if (res_sub3) { document.getElementById('sub3').innerHTML = "<strong style='color: green'>YES</strong>"; }
-                                            else { document.getElementById('sub3').innerHTML = "<strong style='color: red'>NO</strong>"; }
+                                <script> if (res_sub3) { document.getElementById('sub3').innerHTML = "<strong style='color: red'>YES</strong>"; }
+                                            else { document.getElementById('sub3').innerHTML = "<strong style='color: green'>NO</strong>"; }
                                 </script>
                             </td>
                         </tr>
@@ -346,11 +346,11 @@ def server():
                             <td>Sub Sub3</td>
                             <td><a href="https://datatracker.ietf.org/doc/html/rfc4592">RFC 4592</a></td>
                             <td>Wildcard</td>
-                            <td>NO</td>
+                            <td>Yes</td>
                             <td id="ssub3">
                                 <script src="https://sub.sub3.tls.gquetel.fr/ssub3.js"></script>
-                                <script> if (res_ssub3) { document.getElementById('ssub3').innerHTML = "<strong style='color: red'>YES</strong>"; }
-                                            else { document.getElementById('ssub3').innerHTML = "<strong style='color: green'>NO</strong>"; }
+                                <script> if (res_ssub3) { document.getElementById('ssub3').innerHTML = "<strong style='color: green'>YES</strong>"; }
+                                            else { document.getElementById('ssub3').innerHTML = "<strong style='color: red'>NO</strong>"; }
                                 </script>
                             </td>
                         </tr>
