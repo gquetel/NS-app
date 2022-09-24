@@ -1,3 +1,0 @@
-pandas==1.4.2
-tlslite==0.4.9
-tlslite_ng==0.8.0a42

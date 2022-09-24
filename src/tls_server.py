@@ -111,18 +111,16 @@ def server():
         return (my_tlsconnection.TLSConnection(s), s)
 
     try:
-        # Start the TLS connection
         connection, s = connect()
         handshake.do_handshake(connection)
         clientHello = connection.clientHello
 
-        # Routing
-        req = connection.recv(1024).decode('utf-8')
-        req = req.split('\n')
+        req = connection.recv(1024).decode('utf-8').split('\n')
         path = req[0].split(' ')[1]
-        user_agent = None
         sub = clientHello.server_name.decode()
+        user_agent = None
 
+        # Finding user agent in query
         for header in req:
             if re.match("User-Agent:", header):
                 user_agent = header.rstrip()
@@ -133,6 +131,8 @@ def server():
                 'HTTP/1.1 200 OK\nContent-Type: text/html\n\n'.encode())
             connection.send("Couldn't retriver your user-agent".encode())
             return
+
+        # -------------------- Routes without fp calculation --------------------
 
         # GET /src/img/favicon.png serve favicon of webpage
         if re.match("/img/favicon.ico", path):
@@ -154,7 +154,7 @@ def server():
             connection.close()
             return
 
-         # GET sub*.ns-rt.tk/*
+         # GET sub*.tls.gquetel.fr/*
         if (re.match("sub*", sub)):
             if (re.match("sub1", sub)):
                 f = open("src/js/sub1.js", 'rb')
@@ -173,6 +173,26 @@ def server():
             connection.close()
             return
 
+        # GET /fp/ and get the 10 last fingerprints in the database
+        if re.match("^(/fp|/fp/|/fp\?)$", path):
+            connection.send(
+                'HTTP/1.1 200 OK\nContent-Type: application/json\n\n'.encode())
+            connection.send(json.dumps(
+                db_connection.get_fp(), default=str).encode())
+            connection.close()
+            return
+
+        # GET /user-agents/ and get the 10 last user-agents in the database
+        if re.match("^(/user-agents|/user-agents/|/user-agents\?)$", path):
+            connection.send(
+                'HTTP/1.1 200 OK\nContent-Type: application/json\n\n'.encode())
+            connection.send(json.dumps(
+                db_connection.get_ua(), default=str).encode())
+            connection.close()
+            return
+
+        # --------------------  fp calculation --------------------
+
         cipher_suites, weak_ciphers = mapCiphers(clientHello.cipher_suites)
 
         # Sort keys must be set to true so we get the same hash out of 2 same request
@@ -185,51 +205,44 @@ def server():
             'signature_scheme_algorithm': mapSignatureScheme(clientHello.getExtension(ExtensionType.signature_algorithms).extData)
         }, sort_keys=True)
 
-        # Generate sha out of fp, and save data to db now we send the data to the database
+        # Generate sha out of fp, and json objects to encode and send to client
         sha_fp = hashlib.sha384(string_fg.encode()).hexdigest()
-        json_fp = json.loads(string_fg)
-        json_data = json.dumps({
-            'tls_fingerprints': json_fp,
+
+        fp_display = json.dumps({
+            'tls_fingerprints': json.loads(string_fg),
             'user-agent': user_agent,
             'ip_address': s.getpeername()[0],
             'sha_384': sha_fp,
             'weak_ciphers': weak_ciphers
         }, sort_keys=True)
 
-        json_without_ip = json.dumps({
-            'tls_fingerprints': json_fp,
+        fp_to_save_db = json.dumps({
+            'tls_fingerprints': json.loads(string_fg),
             'user-agent': user_agent,
             'sha_384': sha_fp,
         }, sort_keys=True)
+
+        # Save fingerprints to database
+        db_connection.save_client_hello(json.loads(fp_to_save_db))
+
+        # -------------------- Routes with fp calculation --------------------
 
         # GET /api/ and server result in json
         if re.match("^(/api|/api/)$", path):
             connection.send(
                 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n'.encode())
-            connection.send(json_data.encode())
-            connection.close()
-
-            # Save fingerprints to database
-            db_connection.save_client_hello(json.loads(json_without_ip))
-            return
-
-        # GET /fp/ and get the 10 last fingerprints in the database
-        elif re.match("^(/fp|/fp/|/fp\?)$", path):
-            connection.send(
-                'HTTP/1.1 200 OK\nContent-Type: application/json\n\n'.encode())
-            connection.send(db_connection.get_fp().encode())
+            connection.send(fp_display.encode())
             connection.close()
             return
-
 
         # GET /.* print default webpage
-        elif re.match("/$", path):
+        if re.match("/$", path):
 
             weak_ciphers_string = json.dumps({
                 'weak_ciphers': weak_ciphers
             })
             connection.send(
-             'HTTP/1.1 200 OK\nContent-Type: text/html\n\n'.encode())
+                'HTTP/1.1 200 OK\nContent-Type: text/html\n\n'.encode())
             connection.send("""
             <!DOCTYPE html>
             <head>
@@ -243,9 +256,6 @@ def server():
                     var res_sub3 = false;
                     var res_ssub3 = false;
                     var res_sssub3 = false;
-                    var res_sub4 = false;
-                    var res_sub5 = false;
-                    var res_sub6 = false;
                 </script>
             </head>
             <body>
@@ -362,7 +372,7 @@ def server():
                 <script>
                 var data = """.encode())
 
-            connection.send(json_data.encode())
+            connection.send(fp_display.encode())
             connection.send("""
                 var data_weak = """.encode())
             connection.send(weak_ciphers_string.encode())
@@ -371,16 +381,14 @@ def server():
                 document.getElementById("json_weak").innerHTML = JSON.stringify(data_weak, undefined, 2);
 
                 </script>
-
                 </body>
 
               <footer style="">
                 <div style="text-align:left; float:left; width:33%">Referent teacher: GOESSENS Mathieu</div>
                 <div style="text-align:center; float:left; width:33%">DEMOLINIS Rémy, GASSINE Alan, QUETEL Grégor, THAY Jacky</div>
-                <div style="float:right; width:10%"><form action="https://tls.gquetel.fr/fp"><input type="submit" value="See 10 last fingerprints"/></form></div>
+                <div style="float:right; width:10%"><a href="https://tls.gquetel.fr/fp">Last 10 fingerprints</a> </div>
+                <div style="float:right; width:10%"><a href="https://tls.gquetel.fr/user-agents">Last 10 user-agents</a> </div>
             </footer>""".encode())
-            connection.close()
-            db_connection.save_client_hello(json.loads(json_without_ip))
             connection.close()
             return
 
