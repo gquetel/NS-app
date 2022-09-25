@@ -25,21 +25,22 @@ MONGO_URI = ""
 db_connection = None
 
 
-def mapVersion(version):
+def mapVersion(versions):
     """Function to map value given by the protocol version tuple given
     by the client Hello to a human readable value."""
-    if version == (3, 0):
-        return "SSL 3.0"
-    elif version == (3, 1):
-        return "TLS 1.0"
-    elif version == (3, 2):
-        return "TLS 1.1"
-    elif version == (3, 3):
-        return "TLS 1.2"
-    elif version == (3, 4):
-        return "TLS 1.3"
-    else:
-        return None
+    ret = []
+    for version in versions:
+        if version == (3, 0):
+            ret.append("SSL 3.0")
+        elif version == (3, 1):
+            ret.append("TLS 1.0")
+        elif version == (3, 2):
+            ret.append("TLS 1.1")
+        elif version == (3, 3):
+            ret.append("TLS 1.2")
+        elif version == (3, 4):
+            ret.append("TLS 1.3")
+    return ret
 
 
 def mapSignatureScheme(signature_byte_array):
@@ -198,7 +199,7 @@ def server():
         # Sort keys must be set to true so we get the same hash out of 2 same request
         string_fg = json.dumps({
             'cipher_suites': cipher_suites,
-            'client_version': mapVersion(clientHello.client_version),
+            'client_version': mapVersion(clientHello.getExtension(ExtensionType.supported_versions).versions),
             'compression_methods': clientHello.compression_methods,
             'ec_point_format': clientHello.getExtension(ExtensionType.ec_point_formats).formats,
             'supported_groups': mapGroups(clientHello.getExtension(ExtensionType.supported_groups).groups),
