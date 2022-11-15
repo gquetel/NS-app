@@ -47,11 +47,12 @@ def mapSignatureScheme(signature_byte_array):
     """ Function to map value given by the signature_algorithm field"""
 
     sign_hexvalue = []
-    for i in range(len(signature_byte_array), 2):
+    # We ignore the first one because some browser add as first element a random signature
+    for i in range(0, len(signature_byte_array), 2):
         sign_hexvalue.append(int.from_bytes(
             [signature_byte_array[i], signature_byte_array[i+1]], byteorder='big'))
-
     # Then we map them to our df_signature to get a proper name
+
     ret = []
     for client_signature in sign_hexvalue:
         try:
@@ -59,7 +60,6 @@ def mapSignatureScheme(signature_byte_array):
             ret.append(value)
         except KeyError:
             pass
-
     return ret
 
 
@@ -86,15 +86,16 @@ def mapCiphers(cipher_list):
 def mapGroups(group_list):
     """Function to map value given by clientHello in supported group to human
     readable values. """
-
+    
     ret = []
     for client_group in group_list:
         try:
-            value = set_groups[client_group]
+            value = set_groups[str(client_group)]
             ret.append(value)
         except KeyError:
             pass
     return ret
+
 
 
 def server():
