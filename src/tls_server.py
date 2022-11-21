@@ -45,14 +45,14 @@ def mapVersion(versions):
 
 def mapSignatureScheme(signature_byte_array):
     """ Function to map value given by the signature_algorithm field"""
-
+    
     sign_hexvalue = []
     # We ignore the first one because some browser add as first element a random signature
     for i in range(0, len(signature_byte_array), 2):
         sign_hexvalue.append(int.from_bytes(
             [signature_byte_array[i], signature_byte_array[i+1]], byteorder='big'))
-    # Then we map them to our df_signature to get a proper name
 
+   # Then we map them to our df_signature to get a proper name
     ret = []
     for client_signature in sign_hexvalue:
         try:
@@ -69,14 +69,16 @@ def mapCiphers(cipher_list):
 
     ret = []
     weak_cipher = []
-
     for client_cipher in cipher_list:
         try:
+            
             value = set_cipher[client_cipher]["cipher"]
-            ret.append(value)
+            # GREASE and Invalid ciphers
+            if(value != "Reserved"):
+                ret.append(value)
 
-            if(not set_cipher[client_cipher]["recommended"]):
-                weak_cipher.append(value)
+                if(not set_cipher[client_cipher]["recommended"]):
+                    weak_cipher.append(value)
 
         except KeyError:
             pass
@@ -86,7 +88,7 @@ def mapCiphers(cipher_list):
 def mapGroups(group_list):
     """Function to map value given by clientHello in supported group to human
     readable values. """
-    
+
     ret = []
     for client_group in group_list:
         try:
@@ -95,7 +97,6 @@ def mapGroups(group_list):
         except KeyError:
             pass
     return ret
-
 
 
 def server():
@@ -201,7 +202,6 @@ def server():
         string_fg = json.dumps({
             'cipher_suites': cipher_suites,
             'client_version': mapVersion(clientHello.getExtension(ExtensionType.supported_versions).versions),
-            'compression_methods': clientHello.compression_methods,
             'ec_point_format': clientHello.getExtension(ExtensionType.ec_point_formats).formats,
             'supported_groups': mapGroups(clientHello.getExtension(ExtensionType.supported_groups).groups),
             'signature_scheme_algorithm': mapSignatureScheme(clientHello.getExtension(ExtensionType.signature_algorithms).extData)
@@ -386,7 +386,6 @@ def server():
                 </body>
 
               <footer style="">
-                <div style="text-align:left; float:left; width:33%">Referent teacher: GOESSENS Mathieu</div>
                 <div style="text-align:center; float:left; width:33%">DEMOLINIS Rémy, GASSINE Alan, QUETEL Grégor, THAY Jacky</div>
                 <div style="float:right; width:10%"><a href="https://tls.gquetel.fr/fp">Last 10 fingerprints</a> </div>
                 <div style="float:right; width:10%"><a href="https://tls.gquetel.fr/user-agents">Last 10 user-agents</a> </div>
