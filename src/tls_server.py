@@ -45,7 +45,7 @@ def mapVersion(versions):
 
 def mapSignatureScheme(signature_byte_array):
     """ Function to map value given by the signature_algorithm field"""
-    
+
     sign_hexvalue = []
     # We ignore the first one because some browser add as first element a random signature
     for i in range(0, len(signature_byte_array), 2):
@@ -71,7 +71,7 @@ def mapCiphers(cipher_list):
     weak_cipher = []
     for client_cipher in cipher_list:
         try:
-            
+
             value = set_cipher[client_cipher]["cipher"]
             # GREASE and Invalid ciphers
             if(value != "Reserved"):
@@ -220,7 +220,7 @@ def server():
 
         fp_to_save_db = json.dumps({
             'tls_fingerprints': json.loads(string_fg),
-            'user-agent': user_agent,
+            'user-agent': [user_agent],
             'sha_384': sha_fp,
         }, sort_keys=True)
 
@@ -463,4 +463,7 @@ if __name__ == "__main__":
     print("Server up and running: https://", ADDRESS, ":", PORT, sep="")
 
     while True:
-        server()
+        try:
+            server()
+        except Exception as e:
+            print(e)

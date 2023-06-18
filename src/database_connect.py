@@ -9,8 +9,10 @@ class mongo_middleware:
 
         # Check if it's already exists in database
         req = collection_fp.find_one(
-            {'sha_384': json_data['sha_384']},
-            {'user_agent': json_data['user-agent']})
+            {'sha_384': json_data['sha_384']})
+
+        if(json_data['user-agent'] not in req.user_agent):
+            pass
 
         if not req:
             collection_fp.insert_one(json_data)
@@ -22,5 +24,6 @@ class mongo_middleware:
 
     def get_ua(self):
         collection_fp = self.mongo_connection["fp"]
-        req = collection_fp.find({},{"user-agent": 1}).sort("_id", -1).limit(10)
+        req = collection_fp.find({}, {"user-agent": 1}
+                                 ).sort("_id", -1).limit(10)
         return list(req)
